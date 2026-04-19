@@ -10,7 +10,9 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Profil;
 use App\Models\Offre;
 
-class User extends Authenticatable
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
@@ -50,5 +52,17 @@ class User extends Authenticatable
     public function offres()
     {
         return $this->hasMany(Offre::class);
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [
+            'role' => $this->role
+        ];
     }
 }

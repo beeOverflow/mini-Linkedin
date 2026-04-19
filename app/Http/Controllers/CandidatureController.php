@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Offre;
 use App\Models\Candidature;
+use App\Events\CandidatureDeposee;
+use App\Events\StatutCandidatureMis;
 
 class CandidatureController extends Controller
 {
@@ -42,6 +44,9 @@ class CandidatureController extends Controller
             'message'   => $validated['message'] ?? null,
             'statut'    => 'en_attente',
         ]);
+
+        // 🔔 Déclencher l'événement
+        CandidatureDeposee::dispatch($candidature);
 
         return response()->json($candidature, 201);
     }
@@ -101,7 +106,12 @@ class CandidatureController extends Controller
             'statut' => 'required|in:en_attente,acceptee,refusee',
         ]);
 
+        $ancienStatut = $candidature->statut;
+
         $candidature->update(['statut' => $validated['statut']]);
+
+        // 🔔 Déclencher l'événement
+        StatutCandidatureMis::dispatch($candidature, $ancienStatut, $validated['statut']);
 
         return response()->json($candidature);
     }

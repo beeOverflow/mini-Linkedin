@@ -13,17 +13,13 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::middleware('auth:api')->group(function () {
-
-    
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
-
-    
     Route::get('/offres', [OffreController::class, 'index']);
     Route::get('/offres/{offre}', [OffreController::class, 'show']);
 
-    
     Route::middleware('role:candidat')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+        Route::get('/me', [AuthController::class, 'me']);
         Route::post('/profil', [ProfilController::class, 'store']);
         Route::get('/profil', [ProfilController::class, 'show']);
         Route::put('/profil', [ProfilController::class, 'update']);
@@ -33,7 +29,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/mes-candidatures', [CandidatureController::class, 'mesCandidatures']);
     });
 
-    
     Route::middleware('role:recruteur')->group(function () {
         Route::post('/offres', [OffreController::class, 'store']);
         Route::put('/offres/{offre}', [OffreController::class, 'update']);
@@ -42,7 +37,6 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('/candidatures/{candidature}/statut', [CandidatureController::class, 'changerStatut']);
     });
 
-    
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/users', [AdminController::class, 'listUsers']);
         Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
